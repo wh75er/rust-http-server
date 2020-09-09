@@ -2,20 +2,22 @@
 
 #[macro_use] extern crate rocket;
 #[macro_use] extern crate rocket_contrib;
+#[macro_use] extern crate diesel;
 
 mod routes;
 mod person;
+mod schema;
 
 use routes::*;
 use dotenv::dotenv;
-use rocket_contrib::databases::diesel;
+//use rocket_contrib::databases::diesel;
 
 #[database("pgdb")]
 pub struct PersonsDatabase(diesel::PgConnection);
 
-fn main() {
-    dotenv().ok();
-
+fn rocket<T>(db: T) -> rocket::Rocket 
+    where T: rocket::fairing::Fairing
+{
     rocket::ignite()
         .mount("/", routes![show_unit, 
                             show_all,
@@ -23,7 +25,12 @@ fn main() {
                             patch,
                             delete
                             ])
-        .attach(PersonsDatabase::fairing())
-        .launch();
+        .attach(db)
+}
+
+fn main() {
+    dotenv().ok();
+
+    rocket(PersonsDatabase::fairing()).launch();
 }
 
