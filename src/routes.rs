@@ -1,11 +1,6 @@
 use crate::person::*;
 use rocket_contrib::json::Json;
 
-#[get("/")]
-pub fn index() -> &'static str {
-    "Hello, world!"
-}
-
 #[get("/persons/<id>")]
 pub fn show_unit(id: i32) -> String {
     format!("You want some info about {}'s person!\n", id)
