@@ -1,40 +1,36 @@
 use super::person::*;
-use super::schema::persons;
 use super::PersonsDatabase;
 
 use rocket_contrib::json::Json;
-use crate::diesel::prelude::*;
 
 #[get("/persons/<id>")]
-pub fn show_unit(id: i32) -> String {
-    format!("You want some info about {}'s person!\n", id)
+pub fn show_unit(id: i32, conn: PersonsDatabase) -> Json<Person> {
+    Json(Person::read_id(id, &conn).unwrap())
 }
 
 #[get("/persons")]
-pub fn show_all(conn: PersonsDatabase) -> String {
-    let results = persons::table.load::<Person>(&*conn)
-        .expect("Error loading persons");
-    println!("Displaying {} persons", results.len());
-    for person in results {
-        println!("{} works at {}", person.name, person.work);
-    }
-    format!("You want some info about everybody!\n")
+pub fn show_all(conn: PersonsDatabase) -> Json<Vec<Person>> {
+    Json(Person::read(&conn))
 }
 
 #[post("/persons", data = "<p>")]
-pub fn add(p: Json<Person>) -> Json<Person> {
-    p
+pub fn add(p: Json<Person>, conn: PersonsDatabase) -> Json<Person> {
+    let p = p.into_inner();
+    Person::create(&p, &conn);
+    Json(p)
 }
 
 #[patch("/persons/<id>", data = "<p>")]
-pub fn patch(id: i32, p: Json<Person>) -> Json<Person> {
+pub fn patch(id: i32, p: Json<Person>, conn:PersonsDatabase) -> Json<Person> {
     format!("You want make some changes on {} user!\n", id);
+    Person::update(id, &p, &conn);
     let mut p2 = p;
     p2.id = id;
     p2
 }
 
 #[delete("/persons/<id>")]
-pub fn delete(id: i32) -> String {
+pub fn delete(id: i32, conn:PersonsDatabase) -> String {
+    Person::delete(id, &conn);
     format!("You want to delete {} user!\n", id)
 }

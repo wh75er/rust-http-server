@@ -10,7 +10,6 @@ mod schema;
 
 use routes::*;
 use dotenv::dotenv;
-//use rocket_contrib::databases::diesel;
 
 #[database("pgdb")]
 pub struct PersonsDatabase(diesel::PgConnection);

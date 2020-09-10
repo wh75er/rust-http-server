@@ -15,9 +15,14 @@ pub struct Person {
 }
 
 impl Person {
-    pub fn create(p: Person, conn: &PersonsDatabase) -> Result<(), diesel::result::Error> {
+    pub fn create(p: &Person, conn: &PersonsDatabase) -> Result<(), diesel::result::Error> {
         diesel::insert_into(persons::table)
-            .values(&p)
+            .values((
+                persons::name.eq(&p.name),
+                persons::age.eq(&p.age),
+                persons::address.eq(&p.address),
+                persons::work.eq(&p.work)
+                ))
             .execute(&**conn)
             .expect("Error inserting person");
 
@@ -40,9 +45,9 @@ impl Person {
         }
     }
 
-    pub fn update(id: i32, p: Person, conn: &PersonsDatabase) -> Result<Person, diesel::result::Error> {
+    pub fn update(id: i32, p: &Person, conn: &PersonsDatabase) -> Result<Person, diesel::result::Error> {
         Ok(diesel::update(persons::table.find(id))
-            .set(&p)
+            .set(p)
             .get_result(&**conn)?)
     }
 
