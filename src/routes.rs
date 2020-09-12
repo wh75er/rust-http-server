@@ -23,10 +23,7 @@ pub fn add(p: Json<Person>, conn: PersonsDatabase) -> Json<Person> {
 #[patch("/persons/<id>", data = "<p>")]
 pub fn patch(id: i32, p: Json<Person>, conn:PersonsDatabase) -> Json<Person> {
     format!("You want make some changes on {} user!\n", id);
-    Person::update(id, &p, &conn);
-    let mut p2 = p;
-    p2.id = id;
-    p2
+    Json(Person::update(id, &p, &conn).unwrap())
 }
 
 #[delete("/persons/<id>")]
