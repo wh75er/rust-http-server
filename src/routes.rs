@@ -10,7 +10,7 @@ pub fn show_unit(id: i32, conn: PersonsDatabase) -> Json<Person> {
 
 #[get("/persons")]
 pub fn show_all(conn: PersonsDatabase) -> Json<Vec<Person>> {
-    Json(Person::read(&conn))
+    Json(Person::read(&conn).unwrap())
 }
 
 #[post("/persons", data = "<p>")]
