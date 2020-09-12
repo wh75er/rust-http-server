@@ -4,7 +4,7 @@ use super::PersonsDatabase;
 use serde::{Deserialize, Serialize};
 use std::result::Result;
 
-#[derive(Serialize, Deserialize, Queryable, Insertable, AsChangeset)]
+#[derive(Serialize, Deserialize, Queryable, Insertable, AsChangeset, Debug)]
 pub struct Person {
     #[serde(default)]
     pub id: i32,
@@ -31,9 +31,9 @@ impl Person {
     }
 
     pub fn read_id(id: i32, conn: &PersonsDatabase) -> Result<Person, diesel::result::Error> {
-        persons::table.filter(persons::id.eq(id))
-            .load::<Person>(&**conn)
-            .map(|mut vec| vec.pop().unwrap())
+        let mut vec = persons::table.filter(persons::id.eq(id))
+            .load::<Person>(&**conn)?;
+        vec.pop().ok_or(diesel::result::Error::NotFound)
     }
 
     pub fn update(id: i32, p: &Person, conn: &PersonsDatabase) -> Result<Person, diesel::result::Error> {
