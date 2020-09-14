@@ -15,15 +15,16 @@ pub struct Person {
 }
 
 impl Person {
-    pub fn create(p: &Person, conn: &PersonsDatabase) -> Result<usize, diesel::result::Error> {
-        diesel::insert_into(persons::table)
+    pub fn create(p: &Person, conn: &PersonsDatabase) -> Result<Person, diesel::result::Error> {
+        let mut vec = diesel::insert_into(persons::table)
             .values((
                 persons::name.eq(&p.name),
                 persons::age.eq(&p.age),
                 persons::address.eq(&p.address),
                 persons::work.eq(&p.work)
                 ))
-            .execute(&**conn)
+            .get_results(&**conn)?;
+        vec.pop().ok_or(diesel::result::Error::NotFound)
     }
 
     pub fn read(conn: &PersonsDatabase) -> Result<Vec<Person>, diesel::result::Error> {
