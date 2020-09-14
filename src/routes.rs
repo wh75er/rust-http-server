@@ -6,6 +6,7 @@ use serde::{Serialize};
 use rocket::request::Request;
 use rocket::http::{ContentType, Status};
 use rocket::response::{self, Responder, Response};
+use rocket::http::hyper::header;
 
 use diesel::result::Error;
 
@@ -37,12 +38,26 @@ pub struct ApiResponder {
     status: Status,
 }
 
+#[derive(Debug)]
+pub struct LocationWrapper<R>(pub String, pub Option<R>);
+
 impl<'r> Responder<'r> for ApiResponder {
     fn respond_to(self, req: &Request) -> response::Result<'r> {
         Response::build_from(self.inner.respond_to(&req).unwrap())
             .status(self.status)
             .header(ContentType::JSON)
             .ok()
+    }
+}
+
+impl<'r, R: Responder<'r>> Responder<'r> for LocationWrapper<R> {
+    fn respond_to(self, req: &Request) -> response::Result<'r> {
+        let mut build = Response::build();
+        if let Some(responder) = self.1 {
+            build.merge(responder.respond_to(req)?);
+        }
+
+        build.header(header::Location(self.0)).ok()
     }
 }
 
@@ -89,14 +104,14 @@ pub fn show_all(conn: PersonsDatabase) -> ApiResponder {
 }
 
 #[post("/persons", data = "<p>")]
-pub fn add(p: Json<Person>, conn: PersonsDatabase) -> ApiResponder {
+pub fn add(p: Json<Person>, conn: PersonsDatabase) -> impl Responder<'static> {
     let p = p.into_inner();
 
     match Person::create(&p, &conn) {
-        Ok(_v) => ApiResponder {
+        Ok(_v) => LocationWrapper("F".to_string(), Some(ApiResponder {
             inner: JsonRespond::Empty(()),
             status: Status::Created,
-        },
+        })),
         Err(e) => ApiResponder {
             inner: JsonRespond::Error1(Json(JsonError1{
                 message: String::from("Error occured!"),
