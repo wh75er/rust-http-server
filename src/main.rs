@@ -7,6 +7,7 @@
 mod routes;
 mod person;
 mod schema;
+mod db;
 
 use routes::*;
 use dotenv::dotenv;

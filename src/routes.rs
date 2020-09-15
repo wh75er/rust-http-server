@@ -1,5 +1,6 @@
-use super::person::*;
-use super::PersonsDatabase;
+use crate::person::*;
+use crate::PersonsDatabase;
+use crate::db::MainDbOps;
 
 use serde::{Serialize};
 
@@ -51,7 +52,7 @@ impl<'r> Responder<'r> for ApiResponder {
 
 #[get("/persons/<id>")]
 pub fn show_unit(id: i32, conn: PersonsDatabase) -> ApiResponder {
-    match Person::read_id(id, &conn) {
+    match Person::read_id(id, &conn, MainDbOps) {
         Ok(v) => ApiResponder {
             inner: JsonRespond::Item(Json(v)),
             status: Status::Ok,
@@ -79,7 +80,7 @@ pub fn show_unit(id: i32, conn: PersonsDatabase) -> ApiResponder {
 
 #[get("/persons")]
 pub fn show_all(conn: PersonsDatabase) -> ApiResponder {
-    match Person::read(&conn) {
+    match Person::read(&conn, MainDbOps) {
         Ok(v) => ApiResponder {
             inner: JsonRespond::Items(Json(v)),
             status: Status::Ok,
@@ -100,7 +101,7 @@ pub fn show_all(conn: PersonsDatabase) -> ApiResponder {
 pub fn add(p: Json<Person>, conn: PersonsDatabase) -> impl Responder<'static> {
     let p = p.into_inner();
 
-    match Person::create(&p, &conn) {
+    match Person::create(&p, &conn, MainDbOps) {
         Ok(v) => ApiResponder {
             inner: JsonRespond::Empty(()),
             status: Status::Created,
@@ -119,7 +120,7 @@ pub fn add(p: Json<Person>, conn: PersonsDatabase) -> impl Responder<'static> {
 
 #[patch("/persons/<id>", data = "<p>")]
 pub fn patch(id: i32, p: Json<Person>, conn:PersonsDatabase) -> ApiResponder {
-    match Person::update(id, &p, &conn) {
+    match Person::update(id, &p, &conn, MainDbOps) {
         Ok(v) => ApiResponder {
             inner: JsonRespond::Item(Json(v)),
             status: Status::Ok,
@@ -147,7 +148,7 @@ pub fn patch(id: i32, p: Json<Person>, conn:PersonsDatabase) -> ApiResponder {
 
 #[delete("/persons/<id>")]
 pub fn delete(id: i32, conn:PersonsDatabase) -> ApiResponder {
-    match Person::delete(id, &conn) {
+    match Person::delete(id, &conn, MainDbOps) {
         Ok(v) => match v {
             0 => ApiResponder {
                 inner: JsonRespond::Error2(Json(JsonError2 {
