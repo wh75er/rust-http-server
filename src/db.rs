@@ -5,7 +5,7 @@ use crate::person::Person;
 use std::result::Result;
 
 pub struct MainDbOps;
-pub struct TestDbOps;
+//pub struct TestDbOps;
 
 pub trait DbOps {
     fn insert(&self, p: &Person, conn: &PersonsDatabase) -> Result<Vec<Person>, diesel::result::Error>;
