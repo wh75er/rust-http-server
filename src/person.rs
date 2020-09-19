@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use crate::db::DbOps;
 use std::result::Result;
 
-#[derive(Serialize, Deserialize, Queryable, Insertable, AsChangeset, Debug)]
+#[derive(PartialEq, Serialize, Deserialize, Queryable, Insertable, AsChangeset, Debug, Clone)]
 pub struct Person {
     #[serde(default)]
     pub id: i32,

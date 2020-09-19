@@ -3,11 +3,15 @@
 #[macro_use] extern crate rocket;
 #[macro_use] extern crate rocket_contrib;
 #[macro_use] extern crate diesel;
+#[macro_use] extern crate dotenv;
+#[macro_use] extern crate r2d2;
 
 mod routes;
 mod person;
 mod schema;
 mod db;
+
+#[cfg(test)] mod tests;
 
 use routes::*;
 use dotenv::dotenv;
