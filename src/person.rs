@@ -16,6 +16,7 @@ pub struct Person {
     pub work: String,
 }
 
+#[derive(Debug, PartialEq)]
 pub enum ValidateErr {
     AgeErr,
     NameErr,
@@ -62,24 +63,33 @@ impl Validator for Person {
     }
 
     fn name(name: &str) -> Result<(), ValidateErr> {
+        if name.eq("") {
+            return Err(ValidateErr::NameErr);
+        }
         Self::symbols(name).map_err(|_| ValidateErr::NameErr)
     }
 
     fn work(work: &str) -> Result<(), ValidateErr> {
+        if work.eq("") {
+            return Err(ValidateErr::WorkErr);
+        }
         Self::symbols(work).map_err(|_| ValidateErr::WorkErr)
     }
 
     fn address(addr: &str) -> Result<(), ValidateErr> {
+        if addr.eq("") {
+            return Err(ValidateErr::AddressErr);
+        }
         Self::symbols(addr).map_err(|_| ValidateErr::AddressErr)
     }
 
     fn validate(&self) -> Result<(), Vec<ValidateErr>> {
         let mut v: Vec<ValidateErr> = vec!();
 
-        Self::age(&self.age).map_err(|e| v.push(e));
-        Self::name(&self.name).map_err(|e| v.push(e));
-        Self::work(&self.work).map_err(|e| v.push(e));
-        Self::address(&self.address).map_err(|e| v.push(e));
+        let _ = Self::age(&self.age).map_err(|e| v.push(e));
+        let _ = Self::name(&self.name).map_err(|e| v.push(e));
+        let _ = Self::work(&self.work).map_err(|e| v.push(e));
+        let _ = Self::address(&self.address).map_err(|e| v.push(e));
 
         match v.len() {
             0 => Ok(()),
