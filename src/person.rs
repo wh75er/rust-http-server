@@ -16,7 +16,7 @@ pub struct Person {
     pub work: String,
 }
 
-enum ValidateErr {
+pub enum ValidateErr {
     AgeErr,
     NameErr,
     AddressErr,
@@ -36,16 +36,16 @@ impl Display for ValidateErr {
     }
 }
 
-pub trait Validate {
+pub trait Validator {
     fn age(age: &i32) -> Result<(), ValidateErr>;
     fn symbols(s: &str) -> Result<(), ValidateErr>;
     fn name(name: &str) -> Result<(), ValidateErr>;
     fn work(work: &str) -> Result<(), ValidateErr>;
     fn address(addr: &str) -> Result<(), ValidateErr>;
-    fn validate(&self, p: &Person) -> Result<(), ValidateErr>;
+    fn validate(&self) -> Result<(), Vec<ValidateErr>>;
 }
 
-impl Validate for Person {
+impl Validator for Person {
     fn age(age: &i32) -> Result<(), ValidateErr> {
         match age > &0 {
             true => Ok(()),
@@ -73,11 +73,18 @@ impl Validate for Person {
         Self::symbols(addr).map_err(|_| ValidateErr::AddressErr)
     }
 
-    fn validate(&self, p: &Person) -> Result<(), ValidateErr> {
-        let _ = Self::age(&self.age)?;
-        let _ = Self::name(&self.name)?;
-        let _ = Self::work(&self.work)?;
-        Self::address(&self.address)
+    fn validate(&self) -> Result<(), Vec<ValidateErr>> {
+        let mut v: Vec<ValidateErr> = vec!();
+
+        Self::age(&self.age).map_err(|e| v.push(e));
+        Self::name(&self.name).map_err(|e| v.push(e));
+        Self::work(&self.work).map_err(|e| v.push(e));
+        Self::address(&self.address).map_err(|e| v.push(e));
+
+        match v.len() {
+            0 => Ok(()),
+            _ => Err(v),
+        }
     }
 }
 
