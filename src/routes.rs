@@ -107,16 +107,16 @@ pub fn add(p: Json<Person>, conn: PersonsDatabase) -> impl Responder<'static> {
 
     let _ = match p.validate() {
         Ok(k) => k,
-        Err(e) => return ApiResponder {
-            inner: JsonRespond::Error1(Json(JsonError1 {
-                message: String::from("Validation error occured!"),
-                errors: e.iter()
-                    .map(|x| x.to_string())
-                    .collect(),
-            })),
-            status: Status::BadRequest,
-            location: None,
-        },
+        Err(e) => {
+            return ApiResponder {
+                inner: JsonRespond::Error1(Json(JsonError1 {
+                    message: String::from("Validation error occured!"),
+                    errors: e.iter().map(|x| x.to_string()).collect(),
+                })),
+                status: Status::BadRequest,
+                location: None,
+            }
+        }
     };
 
     match Person::create(&p, &conn, MainDbOps) {
@@ -142,16 +142,16 @@ pub fn add(p: Json<Person>, conn: PersonsDatabase) -> impl Responder<'static> {
 pub fn patch(id: i32, p: Json<Person>, conn: PersonsDatabase) -> ApiResponder {
     let _ = match p.validate() {
         Ok(k) => k,
-        Err(e) => return ApiResponder {
-            inner: JsonRespond::Error1(Json(JsonError1 {
-                message: String::from("Validation error occured!"),
-                errors: e.iter()
-                    .map(|x| x.to_string())
-                    .collect(),
-            })),
-            status: Status::BadRequest,
-            location: None,
-        },
+        Err(e) => {
+            return ApiResponder {
+                inner: JsonRespond::Error1(Json(JsonError1 {
+                    message: String::from("Validation error occured!"),
+                    errors: e.iter().map(|x| x.to_string()).collect(),
+                })),
+                status: Status::BadRequest,
+                location: None,
+            }
+        }
     };
 
     match Person::update(id, &p, &conn, MainDbOps) {

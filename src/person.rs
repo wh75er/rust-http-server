@@ -84,7 +84,7 @@ impl Validator for Person {
     }
 
     fn validate(&self) -> Result<(), Vec<ValidateErr>> {
-        let mut v: Vec<ValidateErr> = vec!();
+        let mut v: Vec<ValidateErr> = vec![];
 
         let _ = Self::age(&self.age).map_err(|e| v.push(e));
         let _ = Self::name(&self.name).map_err(|e| v.push(e));

@@ -11,7 +11,7 @@ fn correct_validation_test() {
     };
 
     let val = p.validate();
-    
+
     assert_eq!(true, val.is_ok());
 }
 
@@ -28,7 +28,7 @@ fn incorrect_age_validation_test() {
     let val = p.validate();
 
     assert_eq!(false, val.is_ok());
-    
+
     let mut verr = val.err().unwrap();
 
     assert_eq!(1, verr.len());
