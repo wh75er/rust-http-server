@@ -45,4 +45,4 @@ jobs:
         with:
           build-root-directory: integration-tests
           wrapper-directory: integration-tests
-          arguments: clean test -PtargetUrl=https://rsoi-person-service.herokuapp.com
+          arguments: clean test -PtargetUrl=https://rocket-web-server.herokuapp.com/
