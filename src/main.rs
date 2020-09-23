@@ -17,6 +17,9 @@ mod schema;
 #[cfg(test)]
 mod tests;
 
+use diesel::result::DatabaseErrorKind::__Unknown;
+use diesel::result::Error::DatabaseError;
+use diesel_migrations::RunMigrationsError::QueryError;
 use rocket::fairing::AdHoc;
 use rocket::Rocket;
 
@@ -33,10 +36,22 @@ fn run_db_migrations(rocket: Rocket) -> Result<Rocket, Rocket> {
     let conn = PersonsDatabase::get_one(&rocket).expect("database connection");
     match embedded_migrations::run(&*conn) {
         Ok(()) => Ok(rocket),
-        Err(e) => {
-            println!("Failed to run database migrations: {:?}", e);
-            Err(rocket)
-        }
+        Err(e) => match e {
+            QueryError(e2) => match e2 {
+                DatabaseError(e3, _) => match e3 {
+                    __Unknown => {
+                        println!("Warning!: Migration failure due to possible relation existence!(Ignoring)");
+                        Ok(rocket)
+                    }
+                    _ => Err(rocket),
+                },
+                _ => Err(rocket),
+            },
+            _ => {
+                println!("Failed to run database migrations: {:?}", e);
+                Err(rocket)
+            }
+        },
     }
 }
 
