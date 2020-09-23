@@ -22,7 +22,7 @@ jobs:
           command: test
           args: --all-features --no-fail-fast
       - name: Deploy app
-        uses: akhileshns/heroku-deploy@v3.5.6
+        uses: akhileshns/heroku-deploy@master
         with:
           heroku_api_key: 2ff2f5ab-e4fb-4f99-9895-d23d7506d8cf
           heroku_app_name: rocket-web-server
