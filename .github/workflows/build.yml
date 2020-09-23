@@ -11,11 +11,17 @@ jobs:
           toolchain: nightly
           override: true
           components: rustfmt, clippy
-      - uses: actions-rs/cargo@v1
+      - name: Build app
+        uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release --all-features
-      # TODO test and deploy project
+      - name: Test app
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --all-features --no-fail-fast
+      # TODO deploy project
       - name: Checkout test repository
         uses: actions/checkout@v2
         with:
