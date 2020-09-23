@@ -22,12 +22,12 @@ jobs:
           command: test
           args: --all-features --no-fail-fast
       - name: Deploy app
-        uses: akhileshns/heroku-deploy@master
+        uses: akhileshns/heroku-deploy@3.5.6
         with:
           heroku_api_key: 2ff2f5ab-e4fb-4f99-9895-d23d7506d8cf
           heroku_app_name: rocket-web-server
           heroku_email: wh75er@gmail.com
-          buildpack: "https://github.com/emk/heroku-buildpack-rust"
+          buildpack: "https://github.com/emk/heroku-buildpack-rust.git"
         env:
           HD_DATABASE_URL: postgres://vukyhmpxfnjwxk:5ad58b1b4b9a869a2d6f814a6aa1980116d8632bad2eb5614ce1aba26a7f293b@ec2-54-75-150-32.eu-west-1.compute.amazonaws.com:5432/d4vh8mhcdji0en
           HD_ROCKET_DATABASES: '{pgdb={url="postgres://vukyhmpxfnjwxk:5ad58b1b4b9a869a2d6f814a6aa1980116d8632bad2eb5614ce1aba26a7f293b@ec2-54-75-150-32.eu-west-1.compute.amazonaws.com:5432/d4vh8mhcdji0en"}}'
