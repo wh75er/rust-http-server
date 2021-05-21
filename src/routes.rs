@@ -2,6 +2,8 @@ use crate::db::MainDbOps;
 use crate::person::*;
 use crate::PersonsDatabase;
 
+use std::env;
+
 use serde::Serialize;
 
 use rocket::http::hyper::header;
@@ -124,7 +126,10 @@ pub fn add(p: Json<Person>, conn: PersonsDatabase) -> impl Responder<'static> {
             inner: JsonRespond::Empty(()),
             status: Status::Created,
             location: Some(
-                "https://rsoi-person-service.herokuapp.com/person/".to_string() + &v.id.to_string(),
+                "https://".to_string() + 
+                &env::var("HEROKU_APP_NAME").unwrap() + 
+                ".herokuapp.com/persons/" + 
+                &v.id.to_string(),
             ),
         },
         Err(e) => ApiResponder {
